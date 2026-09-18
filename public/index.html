@@ -3,14 +3,408 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>StreamYard Clone</title>
+    <style>
+        :root {
+            --bg: #0b1020;
+            --bg-soft: #101a2d;
+            --panel: rgba(16, 24, 39, 0.82);
+            --panel-strong: rgba(15, 20, 32, 0.96);
+            --line: rgba(255, 255, 255, 0.08);
+            --text: #eaf1ff;
+            --muted: #90a0b7;
+            --primary: #4f9cff;
+            --primary-strong: #2877ff;
+            --accent: #7cf7c5;
+            --danger: #ff5b7f;
+            --shadow: 0 20px 45px rgba(2, 6, 23, 0.52);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html, body {
+            margin: 0;
+            min-height: 100%;
+            font-family: Inter, "Segoe UI", sans-serif;
+            background:
+                radial-gradient(circle at top, rgba(79, 156, 255, 0.18), transparent 28%),
+                linear-gradient(160deg, #060b14 0%, #101827 45%, #0c1420 100%);
+            color: var(--text);
+        }
+
+        body {
+            display: grid;
+            place-items: center;
+            padding: 32px 20px;
+        }
+
+        .app-shell {
+            width: min(1180px, 100%);
+            background: rgba(11, 16, 32, 0.7);
+            border: 1px solid var(--line);
+            border-radius: 28px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            backdrop-filter: blur(18px);
+        }
+
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 26px 28px;
+            border-bottom: 1px solid var(--line);
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .brand-mark {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--primary), #8d6bff);
+            display: grid;
+            place-items: center;
+            font-weight: 800;
+            color: white;
+            box-shadow: 0 16px 28px rgba(79, 156, 255, 0.36);
+        }
+
+        .brand h1 {
+            margin: 0;
+            font-size: clamp(1.2rem, 2vw, 1.8rem);
+            letter-spacing: -0.04em;
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(124, 247, 197, 0.08);
+            border: 1px solid rgba(124, 247, 197, 0.25);
+            color: var(--accent);
+            padding: 10px 14px;
+            border-radius: 999px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: currentColor;
+            box-shadow: 0 0 0 6px rgba(124, 247, 197, 0.12);
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: minmax(0, 2fr) minmax(260px, 0.9fr);
+            gap: 22px;
+            padding: 24px 28px 28px;
+        }
+
+        .panel {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 24px;
+            overflow: hidden;
+        }
+
+        .stream-panel {
+            padding: 18px;
+        }
+
+        .video-wrap {
+            position: relative;
+            min-height: 520px;
+            border-radius: 20px;
+            overflow: hidden;
+            background: linear-gradient(145deg, rgba(17, 25, 39, 0.9), rgba(5, 9, 18, 0.95));
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        #localVideo {
+            width: 100%;
+            height: 100%;
+            min-height: 520px;
+            object-fit: cover;
+            display: block;
+            background: #050a14;
+            transform: scaleX(-1);
+        }
+
+        .video-overlay {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background: linear-gradient(180deg, rgba(0,0,0,0.15), rgba(0,0,0,0.46));
+        }
+
+        .stream-meta {
+            position: absolute;
+            left: 18px;
+            right: 18px;
+            bottom: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            z-index: 1;
+        }
+
+        .live-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            background: rgba(255, 91, 127, 0.14);
+            border: 1px solid rgba(255, 91, 127, 0.2);
+            color: #ffc3d1;
+            padding: 9px 12px;
+            border-radius: 999px;
+            backdrop-filter: blur(6px);
+        }
+
+        .stream-badge {
+            color: var(--text);
+            background: rgba(11, 16, 32, 0.46);
+            border: 1px solid rgba(255,255,255,0.08);
+            backdrop-filter: blur(6px);
+            padding: 9px 12px;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            color: var(--muted);
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .info-panel {
+            padding: 20px;
+        }
+
+        .info-panel h3 {
+            margin: 0 0 6px;
+            font-size: 1.05rem;
+        }
+
+        .subtle {
+            margin: 0;
+            color: var(--muted);
+            line-height: 1.6;
+            font-size: 0.96rem;
+        }
+
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        button {
+            border: none;
+            cursor: pointer;
+            border-radius: 14px;
+            font-weight: 700;
+            transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease;
+        }
+
+        button:hover {
+            transform: translateY(-1px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .primary-btn {
+            background: linear-gradient(135deg, var(--primary), var(--primary-strong));
+            color: white;
+            padding: 14px 20px;
+            box-shadow: 0 14px 22px rgba(40, 119, 255, 0.35);
+        }
+
+        .danger-btn {
+            background: linear-gradient(135deg, #ff7a8a, var(--danger));
+            color: white;
+            padding: 14px 20px;
+            box-shadow: 0 14px 22px rgba(255, 91, 127, 0.28);
+        }
+
+        .ghost-btn {
+            background: rgba(255,255,255,0.04);
+            color: var(--text);
+            border: 1px solid var(--line);
+            padding: 14px 20px;
+        }
+
+        .disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+            margin-top: 20px;
+        }
+
+        .stat-box {
+            background: rgba(255,255,255,0.025);
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            padding: 14px 12px;
+        }
+
+        .stat-title {
+            display: block;
+            color: var(--muted);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 1.45rem;
+            font-weight: 700;
+            letter-spacing: -0.04em;
+        }
+
+        .muted-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-top: 18px;
+            color: var(--muted);
+            font-size: 0.82rem;
+        }
+
+        @media (max-width: 900px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+
+            .video-wrap,
+            #localVideo {
+                min-height: 360px;
+            }
+        }
+
+        @media (max-width: 560px) {
+            .topbar {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .controls {
+                flex-direction: column;
+            }
+
+            .primary-btn,
+            .danger-btn,
+            .ghost-btn {
+                width: 100%;
+            }
+        }
+    </style>
 </head>
 <body>
-    <h1>My StreamYard Clone</h1>
-    <div>
-        <video id="localVideo" autoplay muted></video>
-        <button id="startButton">Start Streaming</button>
+    <div class="app-shell">
+        <header class="topbar">
+            <div class="brand">
+                <div class="brand-mark">S</div>
+                <h1>StreamYard Clone</h1>
+            </div>
+            <div class="status-pill" id="streamStatusBadge">
+                <span class="status-dot"></span>
+                <span id="statusText">Ready</span>
+            </div>
+        </header>
+
+        <main class="content">
+            <section class="panel stream-panel">
+                <div class="video-wrap">
+                    <video id="localVideo" autoplay muted playsinline></video>
+                    <div class="video-overlay"></div>
+
+                    <div class="stream-meta">
+                        <div class="live-badge" id="liveIndicator" style="opacity: 0.5;">
+                            <span class="status-dot"></span>
+                            Live
+                        </div>
+                        <div class="stream-badge">Camera preview</div>
+                    </div>
+                </div>
+            </section>
+
+            <aside class="sidebar">
+                <section class="panel info-panel">
+                    <h3>Broadcast controls</h3>
+                    <p class="subtle">Start your stream to push your webcam and microphone output to your configured RTMP destination.</p>
+
+                    <div class="controls">
+                        <button id="startButton" class="primary-btn">Start stream</button>
+                        <button id="stopButton" class="danger-btn disabled" disabled>Stop</button>
+                    </div>
+
+                    <div class="stats">
+                        <div class="stat-box">
+                            <span class="stat-title">Video</span>
+                            <span class="stat-value">1080p</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-title">Audio</span>
+                            <span class="stat-value">128k</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-title">Bitrate</span>
+                            <span class="stat-value">2.5M</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-title">FPS</span>
+                            <span class="stat-value">25</span>
+                        </div>
+                    </div>
+
+                    <div class="muted-row">
+                        <span>Connection</span>
+                        <strong id="connectionState">Awaiting input</strong>
+                    </div>
+                </section>
+
+                <section class="panel info-panel">
+                    <h3>Streaming notes</h3>
+                    <p class="subtle">Make sure your browser allows camera and microphone access, and verify the RTMP target in the server config before going live.</p>
+                    <div class="controls">
+                        <button class="ghost-btn" type="button">Check settings</button>
+                    </div>
+                </section>
+            </aside>
+        </main>
     </div>
+
     <script src="/socket.io/socket.io.js"></script>
     <script src="script.js"></script>
 </body>
