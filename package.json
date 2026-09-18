@@ -1,0 +1,24 @@
+{
+  "name": "streamyard-clone",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "homepage": "https://github.com/Deep-Saha1925/STREAMYARD-CLONE#readme",
+  "bugs": {
+    "url": "https://github.com/Deep-Saha1925/STREAMYARD-CLONE/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Deep-Saha1925/STREAMYARD-CLONE.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}
