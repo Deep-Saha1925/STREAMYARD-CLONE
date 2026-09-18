@@ -8,6 +8,8 @@ const app = express();
 const server = http.createServer(app);
 const io = new SocketIO(server);
 
+app.use(express.static(path.join("public")));
+
 const options = [
     '-i',
     '-',
@@ -31,7 +33,17 @@ const options = [
 
 const ffmpegProcess = spawn('ffmpeg', options);
 
-app.use(express.static(path.join("public")));
+ffmpegProcess.stdout.on("data", (data) => {
+  console.log(`FFmpeg stdout: ${data}`);
+})
+
+ffmpegProcess.stderr.on("data", (data) => {
+  console.error(`FFmpeg stderr: ${data}`);
+})
+
+ffmpegProcess.on("close", (code) => {
+  console.log(`FFmpeg process exited with code ${code}`);
+})
 
 io.on("connection", (socket) => {
     console.log("SocketA connected");
