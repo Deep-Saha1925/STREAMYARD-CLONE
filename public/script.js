@@ -12,7 +12,7 @@ startBtn.addEventListener('click', async () => {
     })
 
     mediaRecorder.ondataavailable = (event) => {
-        
+        socket.emit('binarystream', event.data)
     }
 
     mediaRecorder.start();

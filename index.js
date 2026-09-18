@@ -11,6 +11,9 @@ app.use(express.static(path.join("public")));
 
 io.on("connection", (socket) => {
     console.log("SocketA connected");
+    socket.on("binarystream", (data) => {
+        console.log("Received binary stream data:", data);
+    })
 })
 
 server.listen(3000, () => {
