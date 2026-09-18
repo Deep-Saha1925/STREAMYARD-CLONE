@@ -35,8 +35,15 @@ app.use(express.static(path.join("public")));
 
 io.on("connection", (socket) => {
     console.log("SocketA connected");
-    socket.on("binarystream", (data) => {
-        console.log("Received binary stream data:", data);
+    socket.on("binarystream", (stream) => {
+        console.log("Received binary stream data:", stream);
+        ffmpegProcess.stdin.write(stream, (err) => {
+          if (err) {
+            console.error("Error writing stream data to ffmpeg stdin:", err);
+          } else {
+            console.log("Stream data written to ffmpeg stdin");
+          }
+        })
     })
 })
 
