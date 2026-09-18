@@ -10,7 +10,7 @@ const io = new SocketIO(server);
 app.use(express.static(path.join("public")));
 
 io.on("connection", (socket) => {
-    console.log("Socket connected");
+    console.log("SocketA connected");
 })
 
 server.listen(3000, () => {

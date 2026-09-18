@@ -2,6 +2,7 @@ const startBtn = document.getElementById('startButton');
 const userVideo = document.getElementById('localVideo');
 
 const state = { media: null }
+const socket = io()
 
 startBtn.addEventListener('click', async () => {
     const mediaRecorder = new MediaRecorder(state.media, {
